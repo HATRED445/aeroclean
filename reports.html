@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+
+    <div class="row-between" style="margin-bottom:18px">
+      <div>
+        <h1 class="card-title">Reports</h1>
+        <p class="muted">All personnel reports</p>
+      </div>
+    </div>
+
+    <section class="card" style="margin-bottom:18px">
+      <div class="filters" style="flex-wrap:wrap; gap:12px; align-items:flex-end">
+        <div class="search-group" style="min-width:240px; flex:1">
+          <input type="search" id="filter-search" placeholder="Search reporter, device, note..." aria-label="Search reports">
+          <button type="button" id="filter-search-btn" class="btn btn-primary btn-sm">Search</button>
+        </div>
+        <select id="filter-type" aria-label="Filter by report type" style="min-width:180px">
+          <option value="all">All types</option>
+          <option value="alert_fixed">Alert Fixed</option>
+          <option value="maintenance_complete">Maintenance Complete</option>
+          <option value="broken_device">Broken Device</option>
+        </select>
+        <select id="filter-date-preset" aria-label="Filter by date preset" style="min-width:150px">
+          <option value="all">All time</option>
+          <option value="today">Today</option>
+          <option value="week">This week</option>
+          <option value="month">This month</option>
+          <option value="custom">Custom range</option>
+        </select>
+        <div id="custom-date-range" style="display:none; gap:8px; align-items:center">
+          <label style="font-size:12px; color:var(--on-dark-soft); white-space:nowrap">From</label>
+          <input type="date" id="filter-date-from" style="width:160px; padding:8px 10px; border-radius:8px; border:1px solid var(--glass-line); background:var(--field); color:var(--ink); font:inherit">
+          <label style="font-size:12px; color:var(--on-dark-soft); white-space:nowrap">To</label>
+          <input type="date" id="filter-date-to" style="width:160px; padding:8px 10px; border-radius:8px; border:1px solid var(--glass-line); background:var(--field); color:var(--ink); font:inherit">
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:18px">
+      <div class="table-wrap" id="reports-wrap">
+        <table class="reports-table">
+          <thead>
+            <tr>
+              <th>Reporter</th>
+              <th>Device</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="reports-body"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="reports-empty" hidden>No reports match the current filters.</p>
+
+      <div class="pagination" id="pagination" style="display:flex; justify-content:center; gap:6px; margin-top:16px; flex-wrap:wrap"></div>
+    </section>
+
+    <section class="card archive-box" id="archive-box">
+      <div class="archive-header">
+        <h2 class="section-title" style="margin:0">Archived Reports</h2>
+        <button type="button" class="archive-toggle" id="archive-toggle" aria-expanded="true">Collapse</button>
+      </div>
+      <div class="archive-content" id="archive-content">
+        <div class="table-wrap" id="archive-wrap">
+          <table class="reports-table">
+            <thead>
+              <tr>
+                <th>Reporter</th>
+                <th>Device</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Note</th>
+                <th style="text-align:right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="archive-body"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="archive-empty" hidden>No archived reports.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<div class="modal-backdrop" id="report-modal-backdrop" hidden></div>
+<div class="modal report-detail-modal" id="report-detail-modal" role="dialog" aria-modal="true" aria-labelledby="report-detail-title" hidden>
+  <div class="modal-header">
+    <h2 class="modal-title" id="report-detail-title">Report Details</h2>
+    <button class="modal-close" id="report-detail-close" aria-label="Close modal">&times;</button>
+  </div>
+  <div class="modal-content">
+    <div class="report-detail-field">
+      <span class="report-detail-label">Reporter:</span>
+      <span class="report-detail-value" id="detail-reporter"></span>
+    </div>
+    <div class="report-detail-field">
+      <span class="report-detail-label">Device:</span>
+      <span class="report-detail-value" id="detail-device"></span>
+    </div>
+    <div class="report-detail-field">
+      <span class="report-detail-label">Type:</span>
+      <span class="report-detail-value" id="detail-type"></span>
+    </div>
+    <div class="report-detail-field">
+      <span class="report-detail-label">Status:</span>
+      <span class="report-detail-value" id="detail-status"></span>
+    </div>
+    <div class="report-detail-field">
+      <span class="report-detail-label">Date:</span>
+      <span class="report-detail-value" id="detail-date"></span>
+    </div>
+    <div class="report-detail-field">
+      <span class="report-detail-label">Time:</span>
+      <span class="report-detail-value" id="detail-time"></span>
+    </div>
+    <div class="report-detail-field" style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.18)">
+      <span class="report-detail-label" style="margin-top:0">Note:</span>
+      <div class="report-detail-note" id="detail-note"></div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; margin-top:16px; gap:10px">
+      <button type="button" class="btn btn-danger btn-sm" id="detail-archive">Archive</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/reports.js"></script>
+</body>
+</html>

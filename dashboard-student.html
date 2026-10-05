@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student dashboard · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body data-allowed="student">
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+    <section class="card" style="margin-bottom:20px">
+      <div class="hero">
+        <div class="hero-avatar" id="avatar">S</div>
+        <div>
+          <div class="muted" id="greeting">Welcome</div>
+          <div class="hero-name" id="full-name">—</div>
+          <span class="badge badge-student">Student</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2 class="section-title">Account details</h2>
+        <span class="badge badge-active" id="status-badge">Active</span>
+      </div>
+
+      <dl class="info-grid">
+        <div class="info"><dt>Full name</dt><dd id="f-full-name">—</dd></div>
+        <div class="info"><dt>School ID</dt><dd id="f-school-id">—</dd></div>
+        <div class="info"><dt>Email</dt><dd id="f-email">—</dd></div>
+        <div class="info"><dt>Phone number</dt><dd id="f-phone">—</dd></div>
+        <div class="info"><dt>Registered</dt><dd id="f-created">—</dd></div>
+        <div class="info"><dt>Account status</dt><dd id="f-status">—</dd></div>
+      </dl>
+
+      <p class="hint" style="margin-top:16px">
+        Your student account is active. You can sign in on any device using your School ID and password.
+      </p>
+    </section>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

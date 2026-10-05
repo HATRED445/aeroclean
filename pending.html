@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account pending approval · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<main class="auth-shell">
+  <div class="auth-col">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+
+    <section class="card stack">
+      <div class="icon-tile" id="state-icon">&#9201;</div>
+
+      <div>
+        <h1 class="card-title center" id="state-title">Account pending approval</h1>
+        <p class="card-sub center" id="state-message">Loading&hellip;</p>
+      </div>
+
+      <dl class="info">
+        <dt>Account</dt>
+        <dd id="state-account">—</dd>
+      </dl>
+
+      <div class="stack-sm">
+        <button type="button" class="btn btn-light btn-block" id="check-btn">Check status</button>
+        <button type="button" class="btn btn-ghost btn-block" id="back-btn">Back to sign in</button>
+      </div>
+
+      <p class="hint" id="state-hint">
+        Sign-in stays locked until an administrator accepts your personnel account.
+      </p>
+    </section>
+  </div>
+</main>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/pending.js"></script>
+</body>
+</html>

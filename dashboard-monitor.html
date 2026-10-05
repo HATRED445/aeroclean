@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+    <div class="monitor-head">
+      <div>
+        <h1 class="card-title">Odor monitoring</h1>
+        <p class="muted">ESP32 nodes with MQ137 (NH3) and MQ3 (alcohol) sensors</p>
+      </div>
+      <div class="live" id="live-indicator">
+        <span class="live-dot"></span>
+        <span id="live-text">Connecting&hellip;</span>
+      </div>
+    </div>
+
+    <section class="square-grid">
+      <div class="square-tile tile-ok">
+        <div class="tile-head">
+          <span class="tile-label">Rooms in Normal Odor</span>
+          <span class="badge badge-normal">Normal</span>
+        </div>
+        <div>
+          <div class="tile-value" id="normal-count">0</div>
+          <div class="tile-sub" id="normal-sub">of 6 rooms</div>
+        </div>
+        <svg class="sparkline" id="spark-normal" viewBox="0 0 100 40"
+             preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="tile-time" id="normal-time">Updated &mdash;</div>
+      </div>
+
+      <div class="square-tile tile-hot">
+        <div class="tile-head">
+          <span class="tile-label">Rooms in Odor Alert</span>
+          <span class="badge badge-alert">Alert</span>
+        </div>
+        <div>
+          <div class="tile-value" id="alert-count">0</div>
+          <div class="tile-sub" id="alert-sub">of 6 rooms</div>
+        </div>
+        <div class="tile-chips" id="alert-chips"></div>
+        <svg class="sparkline" id="spark-alert" viewBox="0 0 100 40"
+             preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="tile-time" id="alert-time">Updated &mdash;</div>
+      </div>
+    </section>
+
+    <div class="section-head">
+      <h2 class="section-title">Connected devices</h2>
+      <span class="badge badge-active" id="device-count">0 online</span>
+    </div>
+
+    <div class="device-grid" id="device-grid"></div>
+
+    <div class="legend">
+      <span><i class="dot"></i> At or below threshold</span>
+      <span><i class="dot is-hot"></i> Above threshold</span>
+      <span id="legend-thresholds">MQ137 50 ppm &middot; MQ3 25 ppm</span>
+    </div>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<div class="modal-backdrop" id="modal-backdrop" hidden></div>
+<div class="modal" id="device-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+  <div class="modal-header">
+    <h2 class="modal-title" id="modal-title">Device Details</h2>
+    <button class="modal-close" id="modal-close" aria-label="Close modal">&times;</button>
+  </div>
+  <div class="modal-content">
+    <div class="modal-head">
+      <div>
+        <div class="modal-room" id="modal-room"></div>
+        <div class="modal-meta" id="modal-meta"></div>
+      </div>
+      <span class="badge badge-normal" id="modal-status">Normal</span>
+    </div>
+
+    <div class="modal-gauge" id="modal-gauge">
+      <svg viewBox="0 0 160 160" aria-hidden="true">
+        <circle class="gauge-track" cx="80" cy="80" r="70"></circle>
+        <circle class="gauge-value" cx="80" cy="80" r="70" stroke-dasharray="0 439.8" id="modal-gauge-arc"></circle>
+      </svg>
+      <div class="gauge-center">
+        <div class="gauge-num" id="modal-gauge-num">0</div>
+        <div class="gauge-unit">Odor Index %</div>
+      </div>
+    </div>
+
+    <div class="modal-readings" id="modal-readings">
+      <div class="modal-reading">
+        <span class="dot" id="modal-dot137"></span>
+        <span class="reading-name">MQ137 (NH\u2083)</span>
+        <span class="reading-vals" id="modal-mq137">&mdash;</span>
+      </div>
+      <div class="modal-reading">
+        <span class="dot" id="modal-dot3"></span>
+        <span class="reading-name">MQ3 (Alcohol)</span>
+        <span class="reading-vals" id="modal-mq3">&mdash;</span>
+      </div>
+      <p class="modal-readings-desc" id="modal-readings-desc"></p>
+    </div>
+
+    <div class="modal-foot" id="modal-foot">
+      <span id="modal-type"></span>
+      <span id="modal-seen">Updated &mdash;</span>
+    </div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/monitor.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deactivated Accounts · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+    <div class="row-between" style="margin-bottom:18px">
+      <div>
+        <h1 class="card-title">Deactivated Accounts</h1>
+        <p class="muted">Accounts that have been deactivated</p>
+      </div>
+      <a href="admin.html" class="btn btn-light btn-sm">Back to Administration</a>
+    </div>
+
+    <section id="deactivated-section">
+      <div class="section-head">
+        <h2 class="section-title">Deactivated accounts</h2>
+        <span class="badge badge-declined" id="deactivated-count">0 deactivated</span>
+      </div>
+
+      <div class="table-wrap" id="deactivated-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>School ID</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Registered</th>
+              <th>Deactivated</th>
+              <th style="text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="deactivated-body"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="deactivated-empty" hidden>No deactivated accounts.</p>
+    </section>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/admin-deactivated.js"></script>
+</body>
+</html>

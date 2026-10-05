@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<main class="auth-shell">
+  <div class="auth-col">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+    <p class="brand-sub">School portal for students, personnel and administrators</p>
+
+    <section class="card">
+      <h1 class="card-title">Welcome back</h1>
+      <p class="card-sub">Sign in with your School ID and password.</p>
+
+      <form id="login-form" class="stack" novalidate>
+        <div class="field">
+          <label for="schoolId">School ID</label>
+          <input id="schoolId" name="schoolId" type="text" autocomplete="username"
+                 placeholder="e.g. ADMIN001" spellcheck="false">
+          <p class="field-error" data-error-for="schoolId"></p>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password"
+                 placeholder="Your password">
+          <p class="field-error" data-error-for="password"></p>
+        </div>
+
+        <div id="login-alert" class="alert" hidden></div>
+
+        <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+      </form>
+
+      <p class="card-foot">Don't have an account? <a href="register.html">Register</a></p>
+    </section>
+
+    <p class="hint" style="margin-top:14px">
+      Demo administrator: <span class="code">ADMIN001</span> / <span class="code">admin123</span>
+    </p>
+  </div>
+</main>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

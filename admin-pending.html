@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pending Approvals · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+    <div class="row-between" style="margin-bottom:18px">
+      <div>
+        <h1 class="card-title">Pending Approvals</h1>
+        <p class="muted">Personnel accounts awaiting review</p>
+      </div>
+      <a href="admin.html" class="btn btn-light btn-sm">Back to Administration</a>
+    </div>
+
+    <section id="pending-section">
+      <div class="section-head">
+        <h2 class="section-title">Pending personnel approvals</h2>
+        <p class="muted">Accounts that have registered but have not yet been approved.</p>
+        <span class="badge badge-pending" id="pending-count-top">0 waiting</span>
+      </div>
+
+      <div class="table-wrap" id="pending-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>School ID</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Registered</th>
+              <th style="text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="pending-body"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="pending-empty" hidden>No personnel accounts are waiting for approval.</p>
+    </section>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/admin-pending.js"></script>
+</body>
+</html>

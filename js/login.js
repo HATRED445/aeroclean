@@ -1,0 +1,34 @@
+Aero.onReady(function () {
+  'use strict';
+
+  if (Aero.redirectIfSignedIn()) return;
+
+  var form = Aero.el('login-form');
+  var alertBox = Aero.el('login-alert');
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    Aero.clearErrors(form);
+    Aero.setAlert(alertBox, '');
+
+    var result = Aero.authenticate(
+      Aero.el('schoolId').value,
+      Aero.el('password').value
+    );
+
+    if (!result.ok) {
+      if (result.code === 'PENDING') {
+        Aero.setPendingUser(result.pendingUserId);
+        Aero.toast(result.message, 'info');
+        window.location.href = 'pending.html';
+        return;
+      }
+      Aero.showErrors(form, result.errors);
+      Aero.setAlert(alertBox, result.message, 'error');
+      return;
+    }
+
+    Aero.login(result.user);
+    window.location.href = Aero.homeFor(result.user.role);
+  });
+});

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create account · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<main class="auth-shell">
+  <div class="auth-col is-wide">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+    <p class="brand-sub">Register a student or personnel account</p>
+
+    <section class="card">
+      <div id="register-view">
+        <h1 class="card-title">Create your account</h1>
+        <p class="card-sub">Students are activated instantly. Personnel accounts require administrator approval.</p>
+
+        <form id="register-form" class="stack" novalidate>
+          <div class="field">
+            <label for="schoolId">School ID</label>
+            <input id="schoolId" name="schoolId" type="text" autocomplete="username"
+                   placeholder="e.g. 2024-00123" spellcheck="false">
+            <p class="field-error" data-error-for="schoolId"></p>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="new-password"
+                   placeholder="At least 8 characters">
+            <p class="field-error" data-error-for="password"></p>
+          </div>
+
+          <div class="field">
+            <label for="fullName">Full Name</label>
+            <input id="fullName" name="fullName" type="text" autocomplete="name"
+                   placeholder="e.g. Juan Dela Cruz">
+            <p class="field-error" data-error-for="fullName"></p>
+          </div>
+
+          <div id="email-field" class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email"
+                   placeholder="name@school.edu" spellcheck="false">
+            <p class="field-error" data-error-for="email"></p>
+          </div>
+
+          <div id="phone-field" class="field">
+            <label for="phone">Phone Number</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel"
+                   placeholder="e.g. 0917 123 4567">
+            <p class="field-error" data-error-for="phone"></p>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Account type</span>
+            <div class="role-toggle" role="group" aria-label="Account type">
+              <button type="button" class="role-btn is-active" data-role="student" aria-pressed="true">Student</button>
+              <button type="button" class="role-btn" data-role="personnel" aria-pressed="false">Personnel</button>
+            </div>
+            <input id="role" name="role" type="hidden" value="student">
+            <p class="field-error" data-error-for="role"></p>
+          </div>
+
+          <div id="register-alert" class="alert" hidden></div>
+
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        </form>
+
+        <p class="card-foot">Already registered? <a href="index.html">Sign in</a></p>
+      </div>
+
+      <div id="register-success" class="stack center" hidden>
+        <div class="icon-tile">&#10003;</div>
+        <h2 class="card-title center" id="success-title">Account created</h2>
+        <p class="card-sub center" id="success-message"></p>
+        <a class="btn btn-primary btn-block" href="index.html">Go to sign in</a>
+        <a class="btn btn-ghost btn-block" href="pending.html" id="success-secondary" hidden>Check approval status</a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/register.js"></script>
+</body>
+</html>

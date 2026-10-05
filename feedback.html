@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feedback · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+    <section class="card">
+      <h2 class="section-title">Send Feedback</h2>
+      <div class="field">
+        <label for="feedback-message">Message</label>
+        <textarea id="feedback-message" rows="8" maxlength="500" placeholder="Enter your feedback (max 500 characters)..."></textarea>
+        <div class="field-error" data-error-for="message"></div>
+        <p class="muted" style="text-align:right"><span id="char-count">0</span>/500</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-block" id="submit-feedback">Submit</button>
+      <p class="muted" style="margin-top:16px; text-align:center">
+        Number: 09100815952 &nbsp; Facebook: Aeroclean
+      </p>
+    </section>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/feedback.js"></script>
+</body>
+</html>
