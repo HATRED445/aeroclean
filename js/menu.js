@@ -23,7 +23,7 @@ Aero.onReady(function () {
       { href: Aero.accountPageFor(user.role), label: 'Account details', section: 'menu' },
       { href: 'reports-personnel.html', label: 'Reports', section: 'menu' }
     );
-  }HATRED445
+  }
 
   links.push({ href: 'feedback.html', label: 'Feedback', section: 'menu' });
 
