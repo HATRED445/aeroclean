@@ -9,7 +9,6 @@ Aero.onReady(function () {
   var PAGE_SIZE = 25;
   var currentPage = 1;
   var filteredReports = [];
-  var archivedFiltered = [];
   var currentDetailReport = null;
 
   var searchInput = Aero.el('filter-search');
@@ -23,12 +22,6 @@ Aero.onReady(function () {
   var reportsEmpty = Aero.el('reports-empty');
   var reportsWrap = Aero.el('reports-wrap');
   var pagination = Aero.el('pagination');
-  var archiveBox = Aero.el('archive-box');
-  var archiveToggle = Aero.el('archive-toggle');
-  var archiveContent = Aero.el('archive-content');
-  var archiveBody = Aero.el('archive-body');
-  var archiveEmpty = Aero.el('archive-empty');
-  var archiveWrap = Aero.el('archive-wrap');
   var modalBackdrop = Aero.el('report-modal-backdrop');
   var detailModal = Aero.el('report-detail-modal');
   var detailClose = Aero.el('report-detail-close');
@@ -114,7 +107,6 @@ Aero.onReady(function () {
     currentPage = 1;
     renderTable();
     renderPagination();
-    renderArchive();
   }
 
   function renderTable() {
@@ -177,36 +169,6 @@ Aero.onReady(function () {
     }
 
     pagination.innerHTML = html;
-  }
-
-  function renderArchive() {
-    var allArchived = Aero.getArchivedReports();
-    archivedFiltered = allArchived.filter(matchesFilters);
-
-    if (archivedFiltered.length === 0) {
-      archiveBody.innerHTML = '';
-      archiveWrap.hidden = true;
-      archiveEmpty.hidden = false;
-      return;
-    }
-
-    archiveWrap.hidden = false;
-    archiveEmpty.hidden = true;
-
-    archiveBody.innerHTML = archivedFiltered.map(function (report) {
-      return (
-        '<tr data-id="' + esc(report.id) + '" style="cursor:pointer">' +
-        '<td class="cell-name">' + esc(report.userName) + '<br><span class="muted">' + esc(report.userSchoolId) + '</span></td>' +
-        '<td>' + esc(report.deviceRoom) + '<br><span class="muted">' + esc(report.deviceId) + '</span></td>' +
-        '<td>' + typeBadge(report.type) + '</td>' +
-        '<td>' + statusBadge(report.deviceStatusAtReport) + '</td>' +
-        '<td>' + dateLabel(report.createdAt) + '</td>' +
-        '<td>' + timeLabel(report.createdAt) + '</td>' +
-        '<td>' + truncate(report.note, 80) + '</td>' +
-        '<td class="cell-actions"><button type="button" class="btn btn-sm btn-ok" data-action="restore" data-id="' + esc(report.id) + '">Restore</button></td>' +
-        '</tr>'
-      );
-    }).join('');
   }
 
   function openDetailModal(report) {
@@ -301,20 +263,6 @@ Aero.onReady(function () {
     }
   });
 
-  archiveBody.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-action="restore"]');
-    if (btn) {
-      handleRestore(btn.getAttribute('data-id'));
-    } else {
-      var row = e.target.closest('tr[data-id]');
-      if (row) {
-        var id = row.getAttribute('data-id');
-        var report = archivedFiltered.find(function (r) { return r.id === id; });
-        if (report) openDetailModal(report);
-      }
-    }
-  });
-
   detailClose.addEventListener('click', closeDetailModal);
   modalBackdrop.addEventListener('click', function (e) {
     if (e.target === modalBackdrop) closeDetailModal();
@@ -324,12 +272,6 @@ Aero.onReady(function () {
   });
 
   detailArchiveBtn.addEventListener('click', handleArchive);
-
-  archiveToggle.addEventListener('click', function () {
-    var expanded = archiveContent.hidden = !archiveContent.hidden;
-    archiveToggle.textContent = expanded ? 'Collapse' : 'Expand';
-    archiveToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-  });
 
   applyFilters();
 });

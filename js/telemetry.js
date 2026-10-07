@@ -17,7 +17,7 @@
   var STALE_MS = 30000;
 
   var THRESHOLDS = {
-    mq137: 50, /* ppm - NH3 */
+    mq137: 35, /* ppm - NH3 */
     mq3: 25    /* ppm - alcohol */
   };
 
@@ -32,12 +32,12 @@
 
   /* typical resting levels per room - spikes push a room over a threshold */
   var BASELINE = [
-    { mq137: 21, mq3: 10 },
-    { mq137: 26, mq3: 13 },
-    { mq137: 33, mq3: 16 },
-    { mq137: 24, mq3: 12 },
-    { mq137: 38, mq3: 19 },
-    { mq137: 18, mq3: 8 }
+    { mq137: 8, mq3: 4 },
+    { mq137: 10, mq3: 5 },
+    { mq137: 12, mq3: 6 },
+    { mq137: 9, mq3: 4 },
+    { mq137: 15, mq3: 7 },
+    { mq137: 6, mq3: 3 }
   ];
 
   var state = null;
@@ -70,7 +70,11 @@
   }
 
   function classify(mq137, mq3) {
-    return mq137 > THRESHOLDS.mq137 || mq3 > THRESHOLDS.mq3 ? 'alert' : 'normal';
+    var mq137High = mq137 > THRESHOLDS.mq137;
+    var mq3High = mq3 > THRESHOLDS.mq3;
+    if (mq137High) return 'alert';
+    if (mq3High) return 'clean';
+    return 'normal';
   }
 
   function odorIndex(mq137, mq3) {
@@ -98,7 +102,7 @@
     for (var i = 0; i < ROOMS.length; i++) devices.push(buildDevice(i));
     return {
       devices: devices,
-      history: { normal: [], alert: [] },
+      history: { normal: [], clean: [], alert: [] },
       lastUpdate: new Date().toISOString(),
       tick: 0
     };
@@ -111,7 +115,9 @@
       !Array.isArray(stored.devices) ||
       stored.devices.length !== ROOMS.length ||
       !stored.history ||
-      !Array.isArray(stored.history.normal)
+      !Array.isArray(stored.history.normal) ||
+      !Array.isArray(stored.history.clean) ||
+      !Array.isArray(stored.history.alert)
     ) {
       return freshState();
     }
@@ -144,18 +150,21 @@
     }
 
     var normal = 0;
+    var clean = 0;
     var alert = 0;
     for (var j = 0; j < devices.length; j++) {
       if (devices[j].status === 'alert') alert++;
+      else if (devices[j].status === 'clean') clean++;
       else normal++;
     }
 
     pushHistory(state.history.normal, normal);
+    pushHistory(state.history.clean, clean);
     pushHistory(state.history.alert, alert);
     state.lastUpdate = new Date().toISOString();
     state.tick++;
     writeStore();
-    return normal + alert;
+    return normal + clean + alert;
   }
 
   function notify() {
@@ -172,14 +181,21 @@
   function getSnapshot() {
     if (!state) state = loadState();
     var normal = 0;
+    var clean = 0;
     var alert = 0;
+    var normalRooms = [];
+    var cleanRooms = [];
     var alertRooms = [];
     for (var i = 0; i < state.devices.length; i++) {
       if (state.devices[i].status === 'alert') {
         alert++;
         alertRooms.push(state.devices[i].room);
+      } else if (state.devices[i].status === 'clean') {
+        clean++;
+        cleanRooms.push(state.devices[i].room);
       } else {
         normal++;
+        normalRooms.push(state.devices[i].room);
       }
     }
     var age = Math.max(0, Date.now() - new Date(state.lastUpdate).getTime());
@@ -191,7 +207,10 @@
       stale: age > STALE_MS,
       total: state.devices.length,
       normal: normal,
+      clean: clean,
       alert: alert,
+      normalRooms: normalRooms,
+      cleanRooms: cleanRooms,
       alertRooms: alertRooms,
       thresholds: THRESHOLDS
     };

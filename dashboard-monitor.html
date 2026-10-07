@@ -44,6 +44,21 @@
         <div class="tile-time" id="normal-time">Updated &mdash;</div>
       </div>
 
+      <div class="square-tile tile-clean">
+        <div class="tile-head">
+          <span class="tile-label">Rooms in Clean Odor</span>
+          <span class="badge badge-clean">Clean</span>
+        </div>
+        <div>
+          <div class="tile-value" id="clean-count">0</div>
+          <div class="tile-sub" id="clean-sub">of 6 rooms</div>
+        </div>
+        <div class="tile-chips" id="clean-chips"></div>
+        <svg class="sparkline" id="spark-clean" viewBox="0 0 100 40"
+             preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="tile-time" id="clean-time">Updated &mdash;</div>
+      </div>
+
       <div class="square-tile tile-hot">
         <div class="tile-head">
           <span class="tile-label">Rooms in Odor Alert</span>
@@ -68,9 +83,10 @@
     <div class="device-grid" id="device-grid"></div>
 
     <div class="legend">
-      <span><i class="dot"></i> At or below threshold</span>
-      <span><i class="dot is-hot"></i> Above threshold</span>
-      <span id="legend-thresholds">MQ137 50 ppm &middot; MQ3 25 ppm</span>
+      <span><i class="dot"></i> Normal</span>
+      <span><i class="dot is-clean"></i> Clean</span>
+      <span><i class="dot is-hot"></i> Odor Alert</span>
+      <span id="legend-thresholds">MQ137 35 ppm &middot; MQ3 25 ppm</span>
     </div>
   </main>
 </div>

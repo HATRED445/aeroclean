@@ -740,6 +740,321 @@
   }
 
   /* ------------------------------------------------------------------ *
+   * schedules storage
+   * ------------------------------------------------------------------ */
+
+  var SCHEDULES_KEY = 'aeroclean.schedules';
+
+  var RECURRENCE_TYPES = {
+    NONE: 'none',
+    DAILY: 'daily',
+    WEEKLY: 'weekly'
+  };
+
+  var RECURRENCE_LABELS = {
+    none: 'One-time',
+    daily: 'Daily',
+    weekly: 'Weekly'
+  };
+
+  function readSchedules() {
+    try {
+      var raw = global.localStorage.getItem(SCHEDULES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function writeSchedules(schedules) {
+    try {
+      global.localStorage.setItem(SCHEDULES_KEY, JSON.stringify(schedules));
+    } catch (err) {
+      /* storage full */
+    }
+  }
+
+  function getRoomName(roomId) {
+    var rooms = Telemetry ? Telemetry.ROOMS : [];
+    for (var i = 0; i < rooms.length; i++) {
+      if (rooms[i].nodeId === roomId) return rooms[i].room;
+    }
+    return 'Unknown Room';
+  }
+
+  function timeToMinutes(time24) {
+    var parts = String(time24).split(':');
+    return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || 0, 10);
+  }
+
+  function minutesToTime24(mins) {
+    var h = Math.floor(mins / 60);
+    var m = mins % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+
+  function formatTime12h(time24) {
+    if (!time24) return '\u2014';
+    var parts = String(time24).split(':');
+    var h = parseInt(parts[0], 10);
+    var m = parts[1] || '00';
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12;
+    if (h12 === 0) h12 = 12;
+    return h12 + ':' + m + ' ' + ampm;
+  }
+
+  function getEventStatus(date, startTime, endTime) {
+    var now = new Date();
+    var eventStart = new Date(date + 'T' + startTime);
+    var eventEnd = new Date(date + 'T' + endTime);
+    if (now < eventStart) return 'upcoming';
+    if (now > eventEnd) return 'completed';
+    return 'ongoing';
+  }
+
+  function statusBadge(status) {
+    var cls = 'badge-status-' + status;
+    var label = status.charAt(0).toUpperCase() + status.slice(1);
+    return '<span class="badge ' + cls + '">' + label + '</span>';
+  }
+
+  function recurrenceBadge(recurrence) {
+    var label = RECURRENCE_LABELS[recurrence] || recurrence;
+    var cls = 'badge-recurrence-' + recurrence;
+    return '<span class="badge ' + cls + '">' + label + '</span>';
+  }
+
+  function addDays(dateStr, days) {
+    var date = new Date(dateStr + 'T00:00:00');
+    date.setDate(date.getDate() + days);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function getOccurrences(schedule, rangeStart, rangeEnd) {
+    var occurrences = [];
+    var baseDate = schedule.date;
+    var start = timeToMinutes(schedule.startTime);
+    var end = timeToMinutes(schedule.endTime);
+    var recurrence = schedule.recurrence || RECURRENCE_TYPES.NONE;
+    var recurrenceEnd = schedule.recurrenceEnd ? new Date(schedule.recurrenceEnd + 'T00:00:00') : null;
+    var rangeEndDate = new Date(rangeEnd + 'T00:00:00');
+    var current = new Date(baseDate + 'T00:00:00');
+    var maxIterations = 400;
+
+    if (recurrence === RECURRENCE_TYPES.NONE) {
+      if (baseDate >= rangeStart && baseDate <= rangeEnd) {
+        occurrences.push({
+          id: schedule.id,
+          baseId: schedule.id,
+          date: baseDate,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          title: schedule.title,
+          description: schedule.description,
+          roomId: schedule.roomId,
+          roomName: schedule.roomName,
+          recurrence: recurrence,
+          status: getEventStatus(baseDate, schedule.startTime, schedule.endTime),
+          isRecurringInstance: false
+        });
+      }
+      return occurrences;
+    }
+
+    var stepDays = recurrence === RECURRENCE_TYPES.DAILY ? 1 : 7;
+    var limitDate = recurrenceEnd && recurrenceEnd < rangeEndDate ? recurrenceEnd : rangeEndDate;
+
+    while (current <= limitDate && maxIterations-- > 0) {
+      var dateStr = current.toISOString().slice(0, 10);
+      if (dateStr >= rangeStart) {
+        occurrences.push({
+          id: schedule.id + '_' + dateStr,
+          baseId: schedule.id,
+          date: dateStr,
+          startTime: schedule.startTime,
+          endTime: schedule.endTime,
+          title: schedule.title,
+          description: schedule.description,
+          roomId: schedule.roomId,
+          roomName: schedule.roomName,
+          recurrence: recurrence,
+          status: getEventStatus(dateStr, schedule.startTime, schedule.endTime),
+          isRecurringInstance: true
+        });
+      }
+      current.setDate(current.getDate() + stepDays);
+    }
+    return occurrences;
+  }
+
+  function getAllOccurrencesInRange(rangeStart, rangeEnd) {
+    var schedules = readSchedules();
+    var all = [];
+    for (var i = 0; i < schedules.length; i++) {
+      if (schedules[i].status === 'cancelled') continue;
+      var occs = getOccurrences(schedules[i], rangeStart, rangeEnd);
+      all.push.apply(all, occs);
+    }
+    all.sort(function(a, b) {
+      var dateCmp = String(a.date).localeCompare(String(b.date));
+      if (dateCmp !== 0) return dateCmp;
+      return String(a.startTime).localeCompare(String(b.startTime));
+    });
+    return all;
+  }
+
+  function timeOverlap(start1, end1, start2, end2) {
+    var s1 = timeToMinutes(start1);
+    var e1 = timeToMinutes(end1);
+    var s2 = timeToMinutes(start2);
+    var e2 = timeToMinutes(end2);
+    return s1 < e2 && s2 < e1;
+  }
+
+  function checkConflicts(roomId, date, startTime, endTime, recurrence, recurrenceEnd, excludeId) {
+    var schedules = readSchedules();
+    var checkStart = date;
+    var checkEnd = recurrenceEnd || addDays(date, 30);
+    for (var i = 0; i < schedules.length; i++) {
+      var s = schedules[i];
+      if (s.id === excludeId) continue;
+      if (s.roomId !== roomId) continue;
+      if (s.status === 'cancelled') continue;
+      var occs = getOccurrences(s, checkStart, checkEnd);
+      for (var j = 0; j < occs.length; j++) {
+        if (timeOverlap(startTime, endTime, occs[j].startTime, occs[j].endTime)) {
+          return { conflict: true, existing: s, occurrence: occs[j] };
+        }
+      }
+    }
+    return { conflict: false };
+  }
+
+  function validateSchedule(data) {
+    var errors = {};
+    if (!data.roomId) errors.roomId = 'Room is required';
+    if (!data.date) errors.date = 'Date is required';
+    if (!data.startTime) errors.startTime = 'Start time is required';
+    if (!data.endTime) errors.endTime = 'End time is required';
+    if (data.startTime && data.endTime) {
+      if (timeToMinutes(data.startTime) >= timeToMinutes(data.endTime)) {
+        errors.endTime = 'End time must be after start time';
+      }
+    }
+    if (!data.title || !data.title.trim()) errors.title = 'Title is required';
+    if (data.title && data.title.length > 100) errors.title = 'Title must be 100 characters or less';
+    if (data.description && data.description.length > 500) errors.description = 'Description must be 500 characters or less';
+    var validRecurrence = [RECURRENCE_TYPES.NONE, RECURRENCE_TYPES.DAILY, RECURRENCE_TYPES.WEEKLY];
+    if (data.recurrence && !validRecurrence.includes(data.recurrence)) {
+      errors.recurrence = 'Invalid recurrence type';
+    }
+    if (data.recurrence !== RECURRENCE_TYPES.NONE && data.recurrenceEnd) {
+      if (data.recurrenceEnd < data.date) {
+        errors.recurrenceEnd = 'Recurrence end date must be on or after start date';
+      }
+    }
+    if (Object.keys(errors).length) {
+      return { ok: false, errors: errors, message: 'Please correct the highlighted fields' };
+    }
+    return { ok: true, values: data };
+  }
+
+  function createSchedule(data) {
+    var user = currentUser();
+    if (!user || user.role !== 'admin') {
+      return { ok: false, message: 'Only administrators can create schedules' };
+    }
+    var result = validateSchedule(data);
+    if (!result.ok) return result;
+    var values = result.values;
+    var conflict = checkConflicts(values.roomId, values.date, values.startTime, values.endTime, values.recurrence, values.recurrenceEnd, null);
+    if (conflict.conflict) {
+      return { ok: false, message: 'Schedule conflicts with existing schedule on ' + conflict.occurrence.date + ' at ' + formatTime12h(conflict.occurrence.startTime), errors: { date: 'Conflict with existing schedule' } };
+    }
+    var schedule = {
+      id: 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      roomId: values.roomId,
+      roomName: getRoomName(values.roomId),
+      date: values.date,
+      startTime: values.startTime,
+      endTime: values.endTime,
+      title: values.title.trim(),
+      description: values.description ? values.description.trim() : '',
+      createdBy: user.id,
+      createdAt: new Date().toISOString(),
+      recurrence: values.recurrence || RECURRENCE_TYPES.NONE,
+      recurrenceEnd: values.recurrenceEnd || null,
+      status: 'active'
+    };
+    var schedules = readSchedules();
+    schedules.push(schedule);
+    writeSchedules(schedules);
+    return { ok: true, schedule: schedule };
+  }
+
+  function updateSchedule(id, data) {
+    var user = currentUser();
+    if (!user || user.role !== 'admin') {
+      return { ok: false, message: 'Only administrators can update schedules' };
+    }
+    var schedules = readSchedules();
+    var index = -1;
+    for (var i = 0; i < schedules.length; i++) {
+      if (schedules[i].id === id) {
+        index = i;
+        break;
+      }
+    }
+    if (index === -1) return { ok: false, message: 'Schedule not found' };
+    var existing = schedules[index];
+    var merged = Object.assign({}, existing, data);
+    var result = validateSchedule(merged);
+    if (!result.ok) return result;
+    var values = result.values;
+    var conflict = checkConflicts(values.roomId, values.date, values.startTime, values.endTime, values.recurrence, values.recurrenceEnd, id);
+    if (conflict.conflict) {
+      return { ok: false, message: 'Schedule conflicts with existing schedule on ' + conflict.occurrence.date + ' at ' + formatTime12h(conflict.occurrence.startTime), errors: { date: 'Conflict with existing schedule' } };
+    }
+    schedules[index] = Object.assign({}, existing, values);
+    writeSchedules(schedules);
+    return { ok: true, schedule: schedules[index] };
+  }
+
+  function deleteSchedule(id) {
+    var user = currentUser();
+    if (!user || user.role !== 'admin') {
+      return { ok: false, message: 'Only administrators can delete schedules' };
+    }
+    var schedules = readSchedules();
+    for (var i = 0; i < schedules.length; i++) {
+      if (schedules[i].id === id) {
+        schedules[i].status = 'cancelled';
+        writeSchedules(schedules);
+        return { ok: true };
+      }
+    }
+    return { ok: false, message: 'Schedule not found' };
+  }
+
+  function getSchedules(opts) {
+    opts = opts || {};
+    var schedules = readSchedules();
+    if (opts.status) {
+      schedules = schedules.filter(function(s) { return s.status === opts.status; });
+    }
+    if (opts.roomId) {
+      schedules = schedules.filter(function(s) { return s.roomId === opts.roomId; });
+    }
+    if (opts.createdBy) {
+      schedules = schedules.filter(function(s) { return s.createdBy === opts.createdBy; });
+    }
+    return schedules.sort(function(a, b) {
+      return String(b.createdAt).localeCompare(String(a.createdAt));
+    });
+  }
+
+  /* ------------------------------------------------------------------ *
    * form + toast helpers
    * ------------------------------------------------------------------ */
 
@@ -843,6 +1158,21 @@
     getActiveReports: getActiveReports,
     REPORT_TYPES: REPORT_TYPES,
     REPORT_TYPE_LABELS: REPORT_TYPE_LABELS,
+    readSchedules: readSchedules,
+    writeSchedules: writeSchedules,
+    createSchedule: createSchedule,
+    updateSchedule: updateSchedule,
+    deleteSchedule: deleteSchedule,
+    getSchedules: getSchedules,
+    getOccurrences: getOccurrences,
+    getAllOccurrencesInRange: getAllOccurrencesInRange,
+    checkConflicts: checkConflicts,
+    formatTime12h: formatTime12h,
+    getEventStatus: getEventStatus,
+    statusBadge: statusBadge,
+    recurrenceBadge: recurrenceBadge,
+    RECURRENCE_TYPES: RECURRENCE_TYPES,
+    RECURRENCE_LABELS: RECURRENCE_LABELS,
     esc: esc,
     el: el,
     fmtDate: fmtDate,

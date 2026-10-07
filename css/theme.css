@@ -724,6 +724,27 @@ td.cell-actions {
   color: #0369a1;
 }
 
+.badge-clean {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.badge-recurrence-none {
+  background: rgba(237, 233, 254, 0.96);
+  color: #6d28d9;
+}
+
+.badge-recurrence-daily {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-recurrence-weekly {
+  background: #fef3c7;
+  color: #b45309;
+}
+
 /* ---------- info grid (dashboards) ---------- */
 
 .info-grid {
@@ -1176,6 +1197,12 @@ td.cell-actions {
   margin-bottom: 30px;
 }
 
+@media (min-width: 1024px) {
+  .square-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .square-tile {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -1282,6 +1309,18 @@ td.cell-actions {
   fill: #fecaca;
 }
 
+.tile-clean .tile-value {
+  color: #9ca3af;
+}
+
+.tile-clean .spark-line {
+  stroke: #9ca3af;
+}
+
+.tile-clean .spark-area {
+  fill: #9ca3af;
+}
+
 .tile-time {
   font-size: 11.5px;
   color: var(--on-dark-soft);
@@ -1318,6 +1357,11 @@ td.cell-actions {
 .device-card.is-alert {
   border-color: rgba(254, 202, 202, 0.75);
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35), var(--shadow-sm);
+}
+
+.device-card.is-clean {
+  border-color: #d1d5db;
+  box-shadow: 0 0 0 2px #d1d5db, var(--shadow-sm);
 }
 
 .device-head {
@@ -1364,6 +1408,17 @@ td.cell-actions {
   stroke-width: 9;
   stroke-linecap: round;
   transition: stroke-dasharray 0.55s ease, stroke 0.3s ease;
+}
+
+.gauge-value[style*="#fff"],
+.gauge-value[style*="rgb(255, 255, 255)"],
+.gauge-value[style*="rgb(255,255,255)"] {
+  filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgba(255,255,255,0.1));
+}
+
+.gauge.is-clean .gauge-value {
+  opacity: 1;
+  filter: none;
 }
 
 .gauge-center {
@@ -1424,6 +1479,10 @@ td.cell-actions {
 
 .dot.is-hot {
   background: #fca5a5;
+}
+
+.dot.is-clean {
+  background: #fff;
 }
 
 .device-foot {
@@ -1608,6 +1667,17 @@ td.cell-actions {
   transition: stroke-dasharray 0.55s ease, stroke 0.3s ease;
 }
 
+.modal-gauge .gauge-value[style*="#fff"],
+.modal-gauge .gauge-value[style*="rgb(255, 255, 255)"],
+.modal-gauge .gauge-value[style*="rgb(255,255,255)"] {
+  filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px rgba(255,255,255,0.1));
+}
+
+.modal-gauge.is-clean .gauge-value {
+  opacity: 1;
+  filter: none;
+}
+
 .modal-readings {
   display: flex;
   flex-direction: column;
@@ -1701,6 +1771,18 @@ td.cell-actions {
 .badge-status-alert {
   background: #fee2e2;
   color: #991b1b;
+}
+.badge-status-upcoming {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.badge-status-ongoing {
+  background: #fef3c7;
+  color: #b45309;
+}
+.badge-status-completed {
+  background: #e5e7eb;
+  color: #374151;
 }
 
 .report-detail-modal .modal-content {
@@ -1811,5 +1893,51 @@ td.cell-actions {
   #custom-date-range input {
     flex: 1;
     min-width: 140px;
+  }
+}
+
+/* ---------- print styles for schedules ---------- */
+
+@media print {
+  .topbar,
+  .menu-root,
+  .filters,
+  .pagination,
+  #actions-th,
+  .modal-backdrop,
+  .modal,
+  #admin-actions,
+  #print-btn {
+    display: none !important;
+  }
+  .main {
+    padding: 0;
+    max-width: 100%;
+  }
+  .card {
+    box-shadow: none;
+    border: none;
+    background: white;
+    color: black;
+  }
+  .table-wrap {
+    border: none;
+    box-shadow: none;
+  }
+  th,
+  td {
+    border: 1px solid #ccc;
+    color: black;
+  }
+  .badge {
+    background: #eee !important;
+    color: #333 !important;
+    border: 1px solid #ccc;
+  }
+  body {
+    background: white !important;
+  }
+  body::before {
+    display: none;
   }
 }

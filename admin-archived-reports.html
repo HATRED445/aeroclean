@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archived Reports · AeroClean</title>
+<link rel="stylesheet" href="css/theme.css">
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="topbar-start" id="topbar-menu"></div>
+    <div class="brand is-left">
+      <div class="brand-mark">A</div>
+      <div class="brand-name">Aero<span>Clean</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="menu-root" id="app-menu"></div>
+    <div class="row-between" style="margin-bottom:18px">
+      <div>
+        <h1 class="card-title">Archived Reports</h1>
+        <p class="muted">Reports that have been archived</p>
+      </div>
+      <a href="reports.html" class="btn btn-light btn-sm">Back to Reports</a>
+    </div>
+
+    <section id="archived-section">
+      <div class="section-head">
+        <h2 class="section-title">Archived reports</h2>
+        <span class="badge badge-declined" id="archived-count">0 archived</span>
+      </div>
+
+      <div class="table-wrap" id="archived-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Reporter</th>
+              <th>Device</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Note</th>
+              <th style="text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="archived-body"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="archived-empty" hidden>No archived reports.</p>
+    </section>
+  </main>
+</div>
+
+<div id="toast-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/telemetry.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/admin-archived-reports.js"></script>
+</body>
+</html>

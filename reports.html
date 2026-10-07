@@ -24,6 +24,7 @@
         <h1 class="card-title">Reports</h1>
         <p class="muted">All personnel reports</p>
       </div>
+      <a href="admin-archived-reports.html" class="btn btn-ghost btn-sm">Archived Reports</a>
     </div>
 
     <section class="card" style="margin-bottom:18px">
@@ -74,33 +75,6 @@
       <p class="empty" id="reports-empty" hidden>No reports match the current filters.</p>
 
       <div class="pagination" id="pagination" style="display:flex; justify-content:center; gap:6px; margin-top:16px; flex-wrap:wrap"></div>
-    </section>
-
-    <section class="card archive-box" id="archive-box">
-      <div class="archive-header">
-        <h2 class="section-title" style="margin:0">Archived Reports</h2>
-        <button type="button" class="archive-toggle" id="archive-toggle" aria-expanded="true">Collapse</button>
-      </div>
-      <div class="archive-content" id="archive-content">
-        <div class="table-wrap" id="archive-wrap">
-          <table class="reports-table">
-            <thead>
-              <tr>
-                <th>Reporter</th>
-                <th>Device</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Note</th>
-                <th style="text-align:right">Action</th>
-              </tr>
-            </thead>
-            <tbody id="archive-body"></tbody>
-          </table>
-        </div>
-        <p class="empty" id="archive-empty" hidden>No archived reports.</p>
-      </div>
     </section>
   </main>
 </div>

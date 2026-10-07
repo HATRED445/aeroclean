@@ -20,7 +20,7 @@ Aero.onReady(function () {
     return Aero.esc(value);
   }
 
-function timeLabel(iso) {
+  function timeLabel(iso) {
     var date = new Date(iso);
     if (isNaN(date.getTime())) return '\u2014';
     return date.toLocaleTimeString([], {
@@ -30,37 +30,62 @@ function timeLabel(iso) {
     });
   }
 
-  function getGaugeColor(index) {
-    var idx = Math.min(100, index);
-    if (idx <= 80) return '#22c55e';
-    if (idx <= 90) return '#f97316';
-    return '#dc2626';
+  function getGaugeColor(device) {
+    var status = device.status;
+    if (status === 'alert') return '#dc2626';
+    if (status === 'clean') return '#fff';
+    return '#22c55e';
+  }
+
+  function getStatusClass(status) {
+    if (status === 'alert') return 'is-alert';
+    if (status === 'clean') return 'is-clean';
+    return '';
+  }
+
+  function getStatusBadgeClass(status) {
+    if (status === 'alert') return 'badge-alert';
+    if (status === 'clean') return 'badge-clean';
+    return 'badge-normal';
+  }
+
+  function getStatusLabel(status) {
+    if (status === 'alert') return 'Odor Alert';
+    if (status === 'clean') return 'Clean';
+    return 'Normal';
+  }
+
+  function getDotClass(device, sensor) {
+    if (sensor === 'mq137') return 'dot' + (device.mq137 > thresholds.mq137 ? ' is-hot' : '');
+    if (sensor === 'mq3') return 'dot' + (device.mq3 > thresholds.mq3 ? ' is-hot' : '');
+    return 'dot';
   }
 
   function updateModalContent(device) {
-    var hot = device.status === 'alert';
     var idx = Math.max(0, Math.round(device.odorIndex));
+    var status = device.status;
 
     var statusEl = Aero.el('modal-status');
-    statusEl.className = 'badge ' + (hot ? 'badge-alert' : 'badge-normal');
-    statusEl.textContent = hot ? 'Odor Alert' : 'Normal';
+    statusEl.className = 'badge ' + getStatusBadgeClass(status);
+    statusEl.textContent = getStatusLabel(status);
 
     var gaugeEl = Aero.el('modal-gauge');
-    gaugeEl.classList.toggle('is-hot', hot);
+    gaugeEl.classList.toggle('is-hot', status === 'alert');
+    gaugeEl.classList.toggle('is-clean', status === 'clean');
 
     Aero.el('modal-gauge-num').textContent = idx;
     var ratio = Math.min(100, idx) / 100;
     Aero.el('modal-gauge-arc').setAttribute('stroke-dasharray', (MODAL_CIRC * ratio).toFixed(1) + ' ' + MODAL_CIRC.toFixed(1));
-    Aero.el('modal-gauge-arc').style.stroke = getGaugeColor(idx);
+    Aero.el('modal-gauge-arc').style.stroke = getGaugeColor(device);
 
     var m137Hot = device.mq137 > thresholds.mq137;
     var m3Hot = device.mq3 > thresholds.mq3;
 
     Aero.el('modal-mq137').textContent = device.mq137 + ' / ' + thresholds.mq137 + ' ppm';
-    Aero.el('modal-dot137').className = 'dot' + (m137Hot ? ' is-hot' : '');
+    Aero.el('modal-dot137').className = getDotClass(device, 'mq137');
 
     Aero.el('modal-mq3').textContent = device.mq3 + ' / ' + thresholds.mq3 + ' ppm';
-    Aero.el('modal-dot3').className = 'dot' + (m3Hot ? ' is-hot' : '');
+    Aero.el('modal-dot3').className = getDotClass(device, 'mq3');
 
     Aero.el('modal-seen').textContent = 'Updated ' + timeLabel(device.updatedAt);
   }
@@ -77,27 +102,27 @@ function timeLabel(iso) {
     Aero.el('modal-meta').textContent = esc(device.nodeId) + ' \u00B7 ' + esc(device.type);
 
     var statusEl = Aero.el('modal-status');
-    var hot = device.status === 'alert';
-    statusEl.className = 'badge ' + (hot ? 'badge-alert' : 'badge-normal');
-    statusEl.textContent = hot ? 'Odor Alert' : 'Normal';
+    statusEl.className = 'badge ' + getStatusBadgeClass(device.status);
+    statusEl.textContent = getStatusLabel(device.status);
 
     var gaugeEl = Aero.el('modal-gauge');
-    gaugeEl.classList.toggle('is-hot', hot);
+    gaugeEl.classList.toggle('is-hot', device.status === 'alert');
+    gaugeEl.classList.toggle('is-clean', device.status === 'clean');
 
     var idx = Math.max(0, Math.round(device.odorIndex));
     Aero.el('modal-gauge-num').textContent = idx;
     var ratio = Math.min(100, idx) / 100;
     Aero.el('modal-gauge-arc').setAttribute('stroke-dasharray', (MODAL_CIRC * ratio).toFixed(1) + ' ' + MODAL_CIRC.toFixed(1));
-    Aero.el('modal-gauge-arc').style.stroke = getGaugeColor(idx);
+    Aero.el('modal-gauge-arc').style.stroke = getGaugeColor(device);
 
     var m137Hot = device.mq137 > thresholds.mq137;
     var m3Hot = device.mq3 > thresholds.mq3;
 
     Aero.el('modal-mq137').textContent = device.mq137 + ' / ' + thresholds.mq137 + ' ppm';
-    Aero.el('modal-dot137').className = 'dot' + (m137Hot ? ' is-hot' : '');
+    Aero.el('modal-dot137').className = getDotClass(device, 'mq137');
 
     Aero.el('modal-mq3').textContent = device.mq3 + ' / ' + thresholds.mq3 + ' ppm';
-    Aero.el('modal-dot3').className = 'dot' + (m3Hot ? ' is-hot' : '');
+    Aero.el('modal-dot3').className = getDotClass(device, 'mq3');
 
     var desc = 'Readings from ' + esc(device.room) + ' (' + esc(device.nodeId) + ', ' + esc(device.type) + '). ' +
       'MQ137 detects ammonia (NH\u2083); MQ3 detects alcohol vapors. ' +
@@ -219,18 +244,20 @@ function timeLabel(iso) {
     if (node) node.textContent = value;
   }
 
-  function updateCard(card, device) {
-    var hot = device.status === 'alert';
+function updateCard(card, device) {
+    var status = device.status;
     var idx = Math.max(0, Math.round(device.odorIndex));
 
-    card.classList.toggle('is-alert', hot);
+    card.classList.toggle('is-alert', status === 'alert');
+    card.classList.toggle('is-clean', status === 'clean');
 
-    var status = card.querySelector('[data-field="status"]');
-    status.className = 'badge ' + (hot ? 'badge-alert' : 'badge-normal');
-    status.textContent = hot ? 'Odor Alert' : 'Normal';
+    var statusEl = card.querySelector('[data-field="status"]');
+    statusEl.className = 'badge ' + getStatusBadgeClass(status);
+    statusEl.textContent = getStatusLabel(status);
 
     var gauge = card.querySelector('[data-field="gauge"]');
-    gauge.classList.toggle('is-hot', hot);
+    gauge.classList.toggle('is-hot', status === 'alert');
+    gauge.classList.toggle('is-clean', status === 'clean');
 
     card.querySelector('[data-field="index"]').textContent = idx;
 
@@ -238,18 +265,18 @@ function timeLabel(iso) {
     card
       .querySelector('[data-field="arc"]')
       .setAttribute('stroke-dasharray', (CIRC * ratio).toFixed(1) + ' ' + CIRC.toFixed(1));
-    card.querySelector('[data-field="arc"]').style.stroke = getGaugeColor(idx);
+    card.querySelector('[data-field="arc"]').style.stroke = getGaugeColor(device);
 
     var m137Hot = device.mq137 > thresholds.mq137;
     var m3Hot = device.mq3 > thresholds.mq3;
 
     card.querySelector('[data-field="mq137"]').textContent =
       device.mq137 + ' / ' + thresholds.mq137 + ' ppm';
-    card.querySelector('[data-field="dot137"]').className = 'dot' + (m137Hot ? ' is-hot' : '');
+    card.querySelector('[data-field="dot137"]').className = getDotClass(device, 'mq137');
 
     card.querySelector('[data-field="mq3"]').textContent =
       device.mq3 + ' / ' + thresholds.mq3 + ' ppm';
-    card.querySelector('[data-field="dot3"]').className = 'dot' + (m3Hot ? ' is-hot' : '');
+    card.querySelector('[data-field="dot3"]').className = getDotClass(device, 'mq3');
 
     card.querySelector('[data-field="seen"]').textContent = 'Updated ' + timeLabel(device.updatedAt);
   }
@@ -258,6 +285,10 @@ function timeLabel(iso) {
     setText('normal-count', snapshot.normal);
     setText('normal-sub', 'of ' + snapshot.total + ' rooms');
     setText('normal-time', 'Updated ' + timeLabel(snapshot.lastUpdate));
+
+    setText('clean-count', snapshot.clean);
+    setText('clean-sub', 'of ' + snapshot.total + ' rooms');
+    setText('clean-time', 'Updated ' + timeLabel(snapshot.lastUpdate));
 
     setText('alert-count', snapshot.alert);
     setText('alert-sub', 'of ' + snapshot.total + ' rooms');
@@ -279,7 +310,19 @@ function timeLabel(iso) {
         : '<span class="chip">All rooms clear</span>';
     }
 
+    var cleanChips = Aero.el('clean-chips');
+    if (cleanChips) {
+      cleanChips.innerHTML = snapshot.cleanRooms.length
+        ? snapshot.cleanRooms
+            .map(function (room) {
+              return '<span class="chip" style="background:#e5e7eb;color:#374151">' + esc(room) + '</span>';
+            })
+            .join('')
+        : '<span class="chip">No rooms in clean state</span>';
+    }
+
     spark(Aero.el('spark-normal'), snapshot.history.normal, snapshot.total);
+    spark(Aero.el('spark-clean'), snapshot.history.clean, snapshot.total);
     spark(Aero.el('spark-alert'), snapshot.history.alert, snapshot.total);
 
     var cards = grid.children;
