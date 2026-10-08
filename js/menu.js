@@ -16,13 +16,13 @@ Aero.onReady(function () {
 
   if (user.role === 'admin') {
     links.push(
-      { href: 'admin.html', label: 'Accounts', section: 'menu' },
-      { href: 'reports.html', label: 'Reports', section: 'menu' }
+      { href: 'reports.html', label: 'Reports', section: 'menu' },
+      { href: 'admin.html', label: 'Accounts', section: 'menu' }
     );
   } else {
     links.push(
-      { href: Aero.accountPageFor(user.role), label: 'Account details', section: 'menu' },
-      { href: 'reports-personnel.html', label: 'Reports', section: 'menu' }
+      { href: 'reports-personnel.html', label: 'Reports', section: 'menu' },
+      { href: Aero.accountPageFor(user.role), label: 'Account details', section: 'menu' }
     );
   }
 
