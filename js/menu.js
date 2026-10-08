@@ -11,18 +11,18 @@ Aero.onReady(function () {
   var page = window.location.pathname.split('/').pop() || 'index.html';
   var links = [
     { href: 'dashboard-monitor.html', label: 'Dashboard', section: 'menu' },
-    { href: 'schedule.html', label: 'Schedules', section: 'menu' }
+      { href: 'schedule.html', label: 'Schedules', section: 'menu' }
   ];
 
   if (user.role === 'admin') {
     links.push(
-      { href: 'reports.html', label: 'Reports', section: 'menu' },
-      { href: 'admin.html', label: 'Accounts', section: 'menu' }
+      { href: 'admin.html', label: 'Accounts', section: 'menu' },
+      { href: 'reports.html', label: 'Reports', section: 'menu' }
     );
   } else {
     links.push(
-      { href: 'reports-personnel.html', label: 'Reports', section: 'menu' },
-      { href: Aero.accountPageFor(user.role), label: 'Account details', section: 'menu' }
+      { href: Aero.accountPageFor(user.role), label: 'Account details', section: 'menu' },
+      { href: 'reports-personnel.html', label: 'Reports', section: 'menu' }
     );
   }
 
